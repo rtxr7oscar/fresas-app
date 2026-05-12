@@ -1,0 +1,111 @@
+<div class="builder-container">
+  <div class="menu-section">
+    <h2>🍓 Arma tus Fresas</h2>
+
+    <div class="step-card">
+      <h3>1. Escoge el Tamaño <span class="required">*</span></h3>
+      <div class="options-grid">
+        @for (size of sizes; track size.name) {
+          <button 
+            class="option-btn" 
+            [class.selected]="selectedSize === size" 
+            (click)="selectSize(size)">
+            <span class="name">{{ size.name }}</span>
+            <span class="price">${{ size.price }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="step-card">
+      <h3>2. Elige tu Base <span class="required">*</span></h3>
+      <div class="options-grid">
+        @for (base of bases; track base.name) {
+          <button 
+            class="option-btn" 
+            [class.selected]="selectedBase === base" 
+            (click)="selectBase(base)">
+            <span class="name">{{ base.name }}</span>
+            @if (base.price > 0) {
+              <span class="price-extra">(+${{ base.price }})</span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="step-card">
+      <h3>3. Escoge hasta 3 Toppings de Barra</h3>
+      <p class="subtitle">Elegidos: {{ selectedFreeToppings.length }} de 3</p>
+      <div class="options-grid">
+        @for (topping of freeToppingsList; track topping.name) {
+          <button 
+            class="option-btn" 
+            [class.selected]="selectedFreeToppings.includes(topping)" 
+            (click)="toggleFreeTopping(topping)">
+            <span class="name">{{ topping.name }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="step-card">
+      <h3>4. Toppings con Costo Extra</h3>
+      <div class="options-grid">
+        @for (topping of premiumToppingsList; track topping.name) {
+          <button 
+            class="option-btn" 
+            [class.selected]="selectedPremiumToppings.includes(topping)" 
+            (click)="togglePremiumTopping(topping)">
+            <span class="name">{{ topping.name }}</span>
+            <span class="price-extra">+${{ topping.price }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="add-action">
+      <p class="current-total">Subtotal del vaso: <strong>${{ getCurrentUnitPrice() }} MXN</strong></p>
+      <button class="btn-add-cart" (click)="addCurrentItemToCart()">
+        🛒 Agregar vaso al pedido
+      </button>
+    </div>
+  </div>
+
+  <aside class="cart-section">
+    <h3>Tu Pedido 📝</h3>
+    
+    @if (cartService.cartItems().length === 0) {
+      <p class="empty-msg">Aún no has armado ningún vaso.</p>
+    } @else {
+      <ul class="cart-list">
+        @for (item of cartService.cartItems(); track item.id; let i = $index) {
+          <li class="cart-item">
+            <div class="item-header">
+              <strong>Vaso {{ i + 1 }}: {{ item.size?.name }}</strong>
+              <span>${{ item.unitPrice }}</span>
+            </div>
+            <div class="item-details">
+              Base: {{ item.base?.name }} <br>
+              @if (item.freeToppings.length > 0) {
+                Toppings: {{ item.freeToppings.length }} elegidos <br>
+              }
+              @if (item.premiumToppings.length > 0) {
+                Extras: {{ item.premiumToppings.length }} elegidos
+              }
+            </div>
+          </li>
+        }
+      </ul>
+      
+      <div class="cart-total">
+        <span>Total a Pagar:</span>
+        <strong>${{ cartService.getTotal() }} MXN</strong>
+      </div>
+      
+      <button class="btn-whatsapp" (click)="cartService.sendOrder()">
+        📲 Confirmar por WhatsApp
+      </button>
+    }
+  </aside>
+</div>
